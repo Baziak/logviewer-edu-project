@@ -1,0 +1,82 @@
+<a id="backButton" href="?">Back</a>
+
+<form id="searchForm" data-logfile="<?= htmlentities($logFile) ?>">
+    <input id="searchInput" type="text" />
+    <button id="searchSubmitButton" type="submit">Search</button>
+</form>
+
+<div id="itemsList">
+
+</div>
+
+<button id="loadMoreButton" type="submit">More</button><span id="noMoreMessage">No more data</span>
+
+<script>
+
+    var itemsLimit = 10;
+
+    var loadedItems = 0;
+
+    function appendData(data) {
+        var $list = $('#itemsList');
+
+        if (Array.isArray(data) && data.length > 0) {
+            for (var i in data) {
+                $('<p>' + data[i] + '</p>').appendTo($list);
+                loadedItems++;
+            }
+            $("#noMoreMessage").css("display", "none");
+
+        } else {
+            $("#noMoreMessage").css("display", "inline");
+        }
+
+        $("#loadMoreButton").css("display", "inline");
+    }
+
+    function clearData() {
+        loadedItems = 0;
+        $('#itemsList').empty();
+    }
+
+    function loadData(offset, limit, callback) {
+        $.get(
+            'viewer.php', {
+                action: 'search-log-records',
+                logFile: $('#searchForm').data('logfile'),
+                query: $('#searchInput').val(),
+                offset: offset,
+                limit: limit
+            },
+            callback,
+            'json'
+        );
+    }
+
+    var loadedItems = 0;
+
+    function loadMoreData(limit, callback) {
+        loadData(loadedItems, limit, callback)
+    }
+
+    $('#searchForm').on('submit', function(event) {
+        event.preventDefault();
+
+        loadData(0, itemsLimit, function (data) {
+
+            clearData();
+            appendData(data);
+        });
+    });
+
+
+
+    $('#loadMoreButton').on('click', function() {
+
+        loadMoreData(itemsLimit, function (data) {
+
+            appendData(data);
+        });
+    });
+
+</script>

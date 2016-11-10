@@ -1,0 +1,7 @@
+<div id="itemsList">
+<?php foreach ($logs as $log) : ?>
+    <p><a href="?action=view-log&logFile=<?= htmlentities(urlencode($log)) ?>">
+        <?= htmlentities($log) ?>
+    </a></p>
+<?php endforeach ?>
+</div>
